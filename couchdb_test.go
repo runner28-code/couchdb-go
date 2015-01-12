@@ -14,7 +14,7 @@ var timeout = time.Duration(500 * time.Millisecond)
 var unittestdb = "unittestdb"
 var server = "127.0.0.1"
 var numDbs = 1
-var adminAuth = couchdb.BasicAuth{Username: "adminuser", Password: "password"}
+var adminAuth = &couchdb.BasicAuth{Username: "adminuser", Password: "password"}
 
 type TestDocument struct {
 	Title string
@@ -330,13 +330,13 @@ func TestUser(t *testing.T) {
 		t.Fail()
 	}
 	//check user can access db
-	db := conn.SelectDB(dbName, couchdb.BasicAuth{"turd.ferguson", "password"})
+	db := conn.SelectDB(dbName, &couchdb.BasicAuth{"turd.ferguson", "password"})
 	theId := getUuid()
 	docRev, err := db.Save(&TestDocument{Title: "My doc"}, theId, "")
 	errorify(t, err)
 	t.Logf("Granting role to user")
 	//check session info
-	authInfo, err := conn.GetAuthInfo(couchdb.BasicAuth{"turd.ferguson", "password"})
+	authInfo, err := conn.GetAuthInfo(&couchdb.BasicAuth{"turd.ferguson", "password"})
 	errorify(t, err)
 	t.Logf("AuthInfo: %v", authInfo)
 	if authInfo.UserCtx.Name != "turd.ferguson" {
@@ -428,12 +428,15 @@ func TestSessions(t *testing.T) {
 	//Create a session for the user
 	cookieAuth, err := conn.CreateSession("turd.ferguson", "password")
 	errorify(t, err)
+	//sleep
+	time.Sleep(time.Duration(5 * time.Second))
 	//Create something
 	db := conn.SelectDB(dbName, cookieAuth)
 	theId := getUuid()
 	docRev, err := db.Save(&TestDocument{Title: "The test doc"}, theId, "")
 	errorify(t, err)
 	t.Logf("Document Rev: %v", docRev)
+	t.Logf("Auth Debug String: %v", cookieAuth.DebugString())
 	//Delete the user session
 	err = conn.DestroySession(cookieAuth)
 	errorify(t, err)
