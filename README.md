@@ -15,13 +15,13 @@ Installation
 ------------
 
 ```
-go get github.com/rhinoman/couchdb-go
+go get github.com/runner28-code/couchdb-go
 ```
 
 Documentation
 -------------
 
-See the Godoc: http://godoc.org/github.com/rhinoman/couchdb-go
+See the Godoc: http://godoc.org/github.com/runner28-code/couchdb-go
 
 Example Usage
 -------------
